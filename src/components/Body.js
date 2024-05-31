@@ -1,33 +1,32 @@
-import RestaurantCard, { withPromtedLabel } from "./RestaurantCard";
-import { useState, useEffect, useContext } from "react";
-import Shimmer from "./Shimmer";
-import { Link } from "react-router-dom";
-import useOnlineStatus from "../utils/useOnlineStatus";
-import UserContext from "../utils/UserContext";
+import RestaurantCard, { withPromtedLabel } from "./RestaurantCard"; // Importing RestaurantCard component and a higher-order component withPromtedLabel
+import { useState, useEffect, useContext } from "react"; // Importing hooks from React
+import Shimmer from "./Shimmer"; // Importing Shimmer component (likely a loading placeholder)
+import { Link } from "react-router-dom"; // Importing Link component from react-router-dom for navigation
+import useOnlineStatus from "../utils/useOnlineStatus"; // Importing custom hook to check online status
+import UserContext from "../utils/UserContext"; // Importing UserContext for managing user context
 
 const Body = () => {
-  // Local State Variable - Super powerful variable
-  const [listOfRestaurants, setListOfRestraunt] = useState([]);
-  const [filteredRestaurant, setFilteredRestaurant] = useState([]);
+  // Local state variables
+  const [listOfRestaurants, setListOfRestraunt] = useState([]); // State for the list of restaurants
+  const [filteredRestaurant, setFilteredRestaurant] = useState([]); // State for the filtered list of restaurants
+  const [searchText, setSearchText] = useState(""); // State for search input text
 
-  const [searchText, setSearchText] = useState("");
+  const RestaurantCardPromoted = withPromtedLabel(RestaurantCard); // Creating a new component with promotional label
 
-  const RestaurantCardPromoted = withPromtedLabel(RestaurantCard);
-
-  // Whenever state variables update, react triggers a reconciliation cycle(re-renders the component)
-
+  // useEffect hook to fetch data when the component mounts
   useEffect(() => {
-    fetchData();
+    fetchData(); // Fetch restaurant data when component mounts
   }, []);
 
+  // Function to fetch restaurant data from API
   const fetchData = async () => {
     const data = await fetch(
       "https://www.swiggy.com/dapi/restaurants/list/v5?lat=12.9351929&lng=77.62448069999999&page_type=DESKTOP_WEB_LISTING"
     );
 
-    const json = await data.json();
+    const json = await data.json(); // Parse the JSON data
 
-    // Optional Chaining
+    // Update state with the fetched data using optional chaining
     setListOfRestraunt(
       json?.data?.cards[2]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
@@ -36,8 +35,9 @@ const Body = () => {
     );
   };
 
-  const onlineStatus = useOnlineStatus();
+  const onlineStatus = useOnlineStatus(); // Use custom hook to check online status
 
+  // Render offline message if the user is offline
   if (onlineStatus === false)
     return (
       <h1>
@@ -45,8 +45,9 @@ const Body = () => {
       </h1>
     );
 
-  const { loggedInUser, setUserName } = useContext(UserContext);
+  const { loggedInUser, setUserName } = useContext(UserContext); // Use UserContext to get and set the logged-in user's name
 
+  // Render Shimmer component while data is loading, otherwise render the main content
   return listOfRestaurants.length === 0 ? (
     <Shimmer />
   ) : (
@@ -59,21 +60,18 @@ const Body = () => {
             className="border border-solid border-black"
             value={searchText}
             onChange={(e) => {
-              setSearchText(e.target.value);
+              setSearchText(e.target.value); // Update search text state
             }}
           />
           <button
             className="px-4 py-2 bg-green-100 m-4 rounded-lg"
             onClick={() => {
-              // Filter the restraunt cards and update the UI
-              // searchText
-              console.log(searchText);
-
+              // Filter the restaurant cards based on search text and update the UI
               const filteredRestaurant = listOfRestaurants.filter((res) =>
                 res.info.name.toLowerCase().includes(searchText.toLowerCase())
               );
 
-              setFilteredRestaurant(filteredRestaurant);
+              setFilteredRestaurant(filteredRestaurant); // Update filtered restaurant state
             }}
           >
             Search
@@ -83,10 +81,11 @@ const Body = () => {
           <button
             className="px-4 py-2 bg-gray-100 rounded-lg"
             onClick={() => {
+              // Filter the list to show only top-rated restaurants
               const filteredList = listOfRestaurants.filter(
                 (res) => res.info.avgRating > 4
               );
-              setFilteredRestaurant(filteredList);
+              setFilteredRestaurant(filteredList); // Update filtered restaurant state
             }}
           >
             Top Rated Restaurants
@@ -96,8 +95,8 @@ const Body = () => {
           <label>UserName : </label>
           <input
             className="border border-black p-2"
-            value={loggedInUser}
-            onChange={(e) => setUserName(e.target.value)}
+            value={loggedInUser} // Display the logged-in user's name
+            onChange={(e) => setUserName(e.target.value)} // Update the user's name
           />
         </div>
       </div>
@@ -105,12 +104,12 @@ const Body = () => {
         {filteredRestaurant.map((restaurant) => (
           <Link
             key={restaurant?.info.id}
-            to={"/restaurants/" + restaurant?.info.id}
+            to={"/restaurants/" + restaurant?.info.id} // Link to the restaurant's detail page
           >
             {restaurant?.info.promoted ? (
-              <RestaurantCardPromoted resData={restaurant?.info} />
+              <RestaurantCardPromoted resData={restaurant?.info} /> // Render promoted restaurant card
             ) : (
-              <RestaurantCard resData={restaurant?.info} />
+              <RestaurantCard resData={restaurant?.info} /> // Render regular restaurant card
             )}
           </Link>
         ))}
@@ -119,4 +118,4 @@ const Body = () => {
   );
 };
 
-export default Body;
+export default Body; // Exporting the Body component
