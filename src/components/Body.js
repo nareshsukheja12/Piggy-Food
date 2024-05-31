@@ -4,7 +4,7 @@ import Shimmer from "./Shimmer"; // Importing Shimmer component (likely a loadin
 import { Link } from "react-router-dom"; // Importing Link component from react-router-dom for navigation
 import useOnlineStatus from "../utils/useOnlineStatus"; // Importing custom hook to check online status
 import UserContext from "../utils/UserContext"; // Importing UserContext for managing user context
-
+import cors from 'cors';
 const Body = () => {
   // Local state variables
   const [listOfRestaurants, setListOfRestraunt] = useState([]); // State for the list of restaurants
@@ -21,17 +21,17 @@ const Body = () => {
   // Function to fetch restaurant data from API
   const fetchData = async () => {
     const data = await fetch(
-      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=12.9351929&lng=77.62448069999999&page_type=DESKTOP_WEB_LISTING"
+      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=18.5912716&lng=73.73890899999999&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"
     );
 
     const json = await data.json(); // Parse the JSON data
-
+    
     // Update state with the fetched data using optional chaining
     setListOfRestraunt(
-      json?.data?.cards[2]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
     setFilteredRestaurant(
-      json?.data?.cards[2]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
   };
 
